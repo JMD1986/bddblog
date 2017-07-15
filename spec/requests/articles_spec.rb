@@ -1,28 +1,63 @@
-require 'rails_helper'
+class ArticlesController < ApplicationController
+  before_action :set_article, only: [:show, :edit, :update, :destroy]
 
-RSpec.describe "Articles", type: :request do
-
-  before do
-    @article = Article.create(title: "Title One", body: "Body of article one")
+  def index
+    @articles = Article.all
   end
 
-  describe 'GET /articles/:id' do
-    context 'with existing article' do
-      before { get "/articles/#{@article.id}" }
+  def new
+    @article = Article.new
+  end
 
-      it "handles existing article" do
-        expect(response.status).to eq 200
-      end
-    end
-
-    context 'with non-existing article' do
-      before { get "/articles/xxxx" }
-
-      it "handles non-existing article" do
-        expect(response.status).to eq 302
-        flash_message = "The article you are looking for could not be found"
-        expect(flash[:alert]).to eq flash_message
-      end
+  def create
+    @article = Article.new(article_params)
+    if @article.save
+      flash[:success] = "Article has been created"
+      redirect_to articles_path
+    else
+      flash.now[:danger] = "Article has not been created"
+      render :new
     end
   end
+
+  def show
+  end
+
+  def edit
+  end
+
+  def update
+    if @article.update(article_params)
+      flash[:success] = "Article has been updated"
+      redirect_to @article
+    else
+      flash.now[:danger] = "Article has not been updated"
+      render :edit
+    end
+  end
+
+  def destroy
+    if @article.destroy
+      flash[:success] = "Article has been deleted"
+      redirect_to articles_path
+    end
+  end
+
+  protected
+
+    def resource_not_found
+      message = "The article you are looking for could not be found"
+      flash[:alert] = message
+      redirect_to root_path
+    end
+
+  private
+
+    def set_article
+      @article = Article.find(params[:id])
+    end
+
+    def article_params
+      params.require(:article).permit(:title, :body)
+    end
 end
