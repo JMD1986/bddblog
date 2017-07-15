@@ -23,6 +23,8 @@ class ArticlesController < ApplicationController
   end
 
   def show
+    @comment = @article.comments.build
+    @comments = @article.comments
   end
 
   def edit
@@ -71,3 +73,4 @@ class ArticlesController < ApplicationController
     def article_params
       params.require(:article).permit(:title, :body)
     end
+end
